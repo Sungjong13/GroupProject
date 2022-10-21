@@ -8,10 +8,16 @@
     <div class="row flex-grow-1" style='border:1px solid gold'>
       <div class="col-2">
         <div class="row">
-          <div class="form-group">
-            <label for="inputAddress">주소</label>
-            <input type="text" class="form-control" id="inputAddress" placeholder="">
-          </div>
+          <form method="post">
+            <div class="form-group">
+              {% csrf_token %}
+              <label for="inputAddress">주소</label>
+              <input type="text" class="form-control" id="inputAddress" placeholder="" name="address" required>
+            </div>
+            <div>
+              <button type="submit" class="btn btn-primary">검색</button>
+            </div>
+          </form>
         </div>
         <div class="row">
           <ul class="list-group">
@@ -32,9 +38,9 @@
 
 {% endblock content %}
 {% block script %}
-  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{KAKAO_API_KEY}}"></script>
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{KAKAO_API_KEY}}&libraries=services"></script>
   <script>
-    function kakaomap(lat, lon) {
+    function showmap(lat, lon) {
       var container = document.getElementById('map');
       console.log(lat,lon)
       var options = {
@@ -48,24 +54,37 @@
         .Map(container, options);
     };
 
-    if (!navigator.geolocation) {
-      alert("지오로케이션을 지원하지 않습니다!");
-      var latitude = 33.450701;
-      var longitude = 126.570667;
-      kakaomap(latitude,longitude)
+    // 현재 위치 불러오기
+    function currentposmap() {
+      if (!navigator.geolocation) {
+        alert("지오로케이션을 지원하지 않습니다!");
+        var latitude = 33.450701;
+        var longitude = 126.570667;
+        showmap(latitude,longitude);
+      };
+      function success(position) {
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+        showmap(latitude,longitude);
+      };
+      function error() {
+        alert("사용자의 위치를 찾을 수 없습니다!");
+        var latitude = 33.450701;
+        var longitude = 126.570667;
+        showmap(latitude,longitude);
+      };
+      navigator.geolocation.getCurrentPosition(success, error);
     };
-    function success(position) {
-      var latitude = position.coords.latitude;
-      var longitude = position.coords.longitude;
-      kakaomap(latitude,longitude)
-    };
-    function error() {
-      alert("사용자의 위치를 찾을 수 없습니다!");
-      var latitude = 33.450701;
-      var longitude = 126.570667;
-      kakaomap(latitude,longitude)
-    };
-    navigator.geolocation.getCurrentPosition(success, error);   
-
+  </script>
+  <script>
+    // 기입 받은 address 없으면
+    if ({{lat}} == 1) {
+      currentposmap();
+    } else if ({{lat}} == 2) {
+      alert('잘못된 주소입니다.');
+      currentposmap();
+    } else {
+      showmap({{lat}},{{lon}});
+    }
   </script>
 {% endblock script %}
