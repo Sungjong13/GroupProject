@@ -48,23 +48,24 @@
         .Map(container, options);
     };
 
+    if (!navigator.geolocation) {
+      alert("지오로케이션을 지원하지 않습니다!");
+      var latitude = 33.450701;
+      var longitude = 126.570667;
+      kakaomap(latitude,longitude)
+    };
+    function success(position) {
+      var latitude = position.coords.latitude;
+      var longitude = position.coords.longitude;
+      kakaomap(latitude,longitude)
+    };
+    function error() {
+      alert("사용자의 위치를 찾을 수 없습니다!");
+      var latitude = 33.450701;
+      var longitude = 126.570667;
+      kakaomap(latitude,longitude)
+    };
+    navigator.geolocation.getCurrentPosition(success, error);   
 
-
-    fetch("http://ip-api.com/json")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("get ip url error");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        lat = data.lat;
-        lon = data.lon;
-        kakaomap(lat, lon)
-        return [lat, lon]
-      })
-      .catch(error => {
-        console.error(error);
-      });
   </script>
 {% endblock script %}
