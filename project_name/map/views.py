@@ -4,6 +4,7 @@ import os
 import json
 from django.core.exceptions import ImproperlyConfigured
 import requests
+from django.http import JsonResponse
 
 
 def get_key(setting):
@@ -29,12 +30,11 @@ def get_latlon(address):
     headers = {"Authorization": f"KakaoAK {api_key}"}
     api_json = json.loads(str(requests.get(url,headers=headers).text))
     if api_json['documents']:
-        address = api_json['documents'][0]
+        info = api_json['documents'][0]
+        return (info['y'], info['x'])
     else:
-        # error 값 2
+        # error 값 2 : 인식 못하는 주솟값 입력함.
         return(2,2)
-
-    return (address['y'], address['x'])
 
 # Create your views here.
 def map_window(request):
@@ -42,17 +42,29 @@ def map_window(request):
     KAKAO_API_KEY = get_key("KAKAO_API_KEY")
 
     # 사용자 입력 주소 처리
-    if request.method == "POST":
-        address = request.POST["address"]
-        lat,lon = get_latlon(address)
-    else:
-        # default 값 1
-        lat,lon = (1, 1)
+    # if request.method == "POST":
+    #     address = request.POST.get("address")
+    #     lat,lon = get_latlon(address)
+
+    #     return JsonResponse({"lat":lat,"lon":lon})
+    # else:
+        # default 값 1. get방식일때 
+    lat,lon = (1, 1)
 
     return render(request, 'map/map_window.html', {"KAKAO_API_KEY":KAKAO_API_KEY, "lat":lat, "lon":lon})
 
+
+# jsonresponse 따로만들어보기
+def ajax_test(request):
+    address = request.POST.get("address")
+    lat,lon = get_latlon(address)
+
+    return JsonResponse({"lat":lat,"lon":lon})
+
+
 if __name__ == '__main__':
     pass
-    get_latlon('대천로 103번길')
+    lat,lon = get_latlon('강남')
+    print(lat,lon)
 
 
