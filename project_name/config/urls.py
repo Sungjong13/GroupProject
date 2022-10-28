@@ -22,4 +22,5 @@ urlpatterns = [
     path("", HomeView.as_view(), name="home"),
     path("users/", include("users.urls")),
     path("accounts/", include("allauth.urls")),
+    path('map/', include('map.urls')),
 ]
