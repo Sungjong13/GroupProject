@@ -55,13 +55,7 @@
           </form>
         </div>
         <div class="row">
-          <ul class="list-group col">
-            <li class="list-group-item" searchterm="동물병원">동물병원
-              <span class="badge badge-primary badge-pill">14</span>
-            </li>
-            <li class="list-group-item" searchterm="애완동물 미용">동물미용샵</li>
-            <li class="list-group-item" searchterm="애완동물 호텔">동물호텔</li>
-          </ul>
+          <ul class="list-group col" id="searchtermlist"></ul>
         </div>
       </div>
       <div class="col-10">
@@ -110,55 +104,6 @@
       };
       navigator.geolocation.getCurrentPosition(_success, _error);
     };
-
-    //하나씩 마커 달기
-    {% comment %} // 키워드 검색 완료 시 호출되는 콜백함수 입니다
-    function placesSearchCB (data, status, pagination) {
-      if (status === kakao.maps.services.Status.OK) {
-
-          // 지도의 현재 영역을 얻어옵니다 
-          var bounds = map.getBounds();
-          console.log('bounds',bounds)
-          console.log('bounds.oa and bounds.ha',bounds.oa,bounds.ha)
-          console.log('data[0].x',data[0].x)
-          console.log('bounds.oa<data[0].x',bounds.oa<data[0].x)
-          console.log('bounds.ha>data[0].x',bounds.ha>data[0].x)
-          console.log(bounds.ha>data[0].x && bounds.oa<data[0].x)
-
-          for (var i=0; i<data.length; i++) {
-            if (((data[i].x < bounds.oa) && (data[i].x > bounds.ha)) && ((data[i].y < bounds.pa) && (data[i].y > bounds.qa))) {
-              displayMarker(data[i]);
-              console.log('marker added')
-            }
-          }
-          //for (var i=0; i<data.length; i++) {
-          //    displayMarker(data[i]);    
-          //    bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
-          //}       
-
-          // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
-          map.setBounds(bounds);
-      } 
-    }
-
-    // 지도에 마커를 표시하는 함수입니다
-    function displayMarker(place) {
-        
-      // 마커를 생성하고 지도에 표시합니다
-      var marker = new kakao.maps.Marker({
-          map: map,
-          position: new kakao.maps.LatLng(place.y, place.x) 
-      });
-
-      // 마커에 클릭이벤트를 등록합니다
-      kakao.maps.event.addListener(marker, 'click', function() {
-          // 마커를 클릭하면 장소명이 인포윈도우에 표출됩니다
-          infowindow.setContent('<div style="padding:5px;font-size:12px;">' + place.place_name + '</div>');
-          infowindow.open(map, marker);
-      });
-    } {% endcomment %}
-
-
 
     // 장소검색이 완료됐을 때 호출되는 콜백함수
     function placesSearchCB(data, status, pagination) {
@@ -281,14 +226,6 @@
       return marker;
     }
 
-    // 지도 위에 표시되고 있는 마커를 모두 제거합니다
-    function removeMarker() {
-      for ( var i = 0; i < markers.length; i++ ) {
-          markers[i].setMap(null);
-      }   
-      markers = [];
-    }
-
     // 검색결과 목록 하단에 페이지번호를 표시는 함수입니다
     function displayPagination(pagination) {
       var paginationEl = document.getElementById('pagination'),
@@ -343,6 +280,69 @@
           el.removeChild (el.lastChild);
       }
     }
+
+    // 장소 개수만 반환하기 위한 콜백함수
+    // 결과 개수만 가져오기 위해 매번 전체 데이터를 가져오는게 비효율적인데, 카카오맵api에서 갯수만 가져오는 쿼리를 못찾겠다.
+    function updateSearchCountCB(data, status, pagination) {
+      if (status === kakao.maps.services.Status.OK) {
+        searchCount = data.length
+        console.log('콜백함수',searchCount)
+        return;
+
+        let curbounds = map.getBounds(); // 현재 맵 바운더리 가져오기
+        console.log('현재바운즈',curbounds)
+        var searchtermlist = document.getElementById('searchtermlist');
+        var stringItem = '';
+        for (const [key, value] of Object.entries(term_dict)) {
+          // keywordSearch사용해 검색, 콜백에서 결과 길이만 반환
+          ps.keywordSearch(key, updateSearchCountCB, {
+            bounds : curbounds
+          });
+          console.log(searchCount);
+          strFrag = '<li class="list-group-item" searchterm="' + key + '">' + value +
+            '<span class="badge badge-primary badge-pill">' + searchCount + '</span>' +
+          '</li>';
+          stringItem = stringItem.concat(strFrag);
+        }
+        searchtermlist.innerHTML = stringItem
+  
+        
+      } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+        console.log('콜백함수검색0',searchCount)
+        searchCount = 0
+        return;
+
+      } else if (status === kakao.maps.services.Status.ERROR) {
+        searchCount = 'err'
+        return;
+
+      } 
+    }
+
+    // 검색어 리스트를 구축하는 함수
+    function createSearchList() {
+      //let curbounds = map.getBounds(); // 현재 맵 바운더리 가져오기
+      //console.log('현재바운즈',curbounds)
+      var searchtermlist = document.getElementById('searchtermlist');
+      var stringItem = '';
+      for (const [key, value] of Object.entries(term_dict)) {
+        // keywordSearch사용해 검색, 콜백에서 결과 길이만 반환
+       // ps.keywordSearch(key, updateSearchCountCB, {
+        //  bounds : curbounds
+        //});
+        //console.log(searchCount);
+        strFrag = '<li class="list-group-item" searchterm="' + key + '">' + value +
+          '<span class="badge badge-primary badge-pill"></span>' +
+        '</li>';
+        stringItem = stringItem.concat(strFrag);
+      }
+      searchtermlist.innerHTML = stringItem
+    }
+
+    function updateSearchCount() {
+
+    }
+
   </script>
 
 
@@ -352,6 +352,9 @@
     // 마커를 담을 배열
     var markers = [];
 
+    // 검색제목과 검색어 dict
+    var term_dict = {'동물병원':'동물병원', '애완동물 미용':'동물미용샵', '애완동물 호텔':'동물호텔'};
+
     //지도 생성
     var container = document.getElementById('map');
     var options = {
@@ -359,13 +362,16 @@
       level: 3
     };
     var map = new kakao.maps.Map(container, options);
-    currentposmap();
 
     // 장소 검색 객체를 생성합니다
     var ps = new kakao.maps.services.Places();
 
     // 검색 결과 목록이나 마커를 클릭했을 때 장소명을 표출할 인포윈도우를 생성합니다
     var infowindow = new kakao.maps.InfoWindow({zIndex:1});
+
+    // 초기 검색어 리스트 생성
+    var searchCount = 0;
+    createSearchList(term_dict);
 
 
     // 이동 버튼 클릭 시 ajax
@@ -406,6 +412,9 @@
 
             // 지도 이동
             panTo(lat,lon);
+
+            // 이동 후 각 검색어 count 업데이트
+            //createSearchList();
           }
         },
         error : function(res,e){
@@ -417,7 +426,7 @@
 
     // li 클릭 시
     $('.list-group-item').on('click', function(e) {
-      
+
       let searchterm = $(this).attr("searchterm");
       let curbounds = map.getBounds();
 
