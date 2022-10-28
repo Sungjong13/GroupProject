@@ -31,5 +31,9 @@ urlpatterns = [
     
     path('payment/',include('payment.urls')),
    
+    path("accounts/", include("allauth.urls")),
+    path('map/', include('map.urls')),
+
+    # test home
     path('', HomeView.as_view(), name="home"),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

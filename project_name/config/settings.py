@@ -53,12 +53,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 앱 추가
     'category',
     'accounts',
     'store',
     'carts',
     'payment',
 
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.naver",
+    "django.contrib.sites",
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -155,7 +162,18 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 
-DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+DEFAULT_AUTO_FIELD='django.db.models.BigAutoField'
 
 KAKAOPAY_CID = "my kakaopay cid"
 KAKAOPAY_APP_ADMIN_KEY = "my kakao app admin key"
+
+# User 커스텀 상태이므로 인증모델 변경
+AUTH_USER_MODEL = "users.User"
+
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+SITE_ID = 1
+LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "/login/"
