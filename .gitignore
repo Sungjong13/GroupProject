@@ -3,6 +3,7 @@
 
 secrets.json
 myenv/
+secrets/
 
 ### Django ###
 *.log
