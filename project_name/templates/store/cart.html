@@ -1,0 +1,108 @@
+{% extends 'store_base.html' %}
+{% load static %}
+
+{% block content %}
+    <section class="section-content padding-y bg">
+    <div class="container">
+
+        <!-- 상품이 없으면-->
+    {% if not cart_items %}
+        <h2 class="text-center">상품이 없습니다.</h2>
+        <br>
+        <!-- 쇼핑몰로 돌아가기-->
+        <div class="text-center">
+            <a href="{% url 'store' %}" class="btn btn-primary">쇼핑몰로 돌아가기</a>
+        </div>
+    {% else %}
+    <div class="row">
+        <aside class="col-lg-9">
+    <div class="card">
+    <table class="table table-borderless table-shopping-cart">
+    <thead class="text-muted">
+    <tr class="small text-uppercase">
+    <th scope="col">물품</th>
+    <th scope="col" width="120">개수</th>
+    <th scope="col" width="120">가격</th>
+    <th scope="col" class="text-right" width="200"> </th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- 아이템이 있다면-->
+{% for cart_item in cart_items %}
+    <tr>
+        <td>
+            <figure class="itemside align-items-center">
+                <div class="aside"><a href="{{ cart_item.product.get_url }}"><img src="{{ cart_item.product.images.url }}" class="img-sm"></a></div>
+                <figcaption class="info">
+                    <a href="{{ cart_item.product.get_url }}" class="title text-dark">{{ cart_item.product.product_name }}</a>
+                </figcaption>
+            </figure>
+        </td>
+        <td> 
+            
+                        <div class="col"> 
+                            <div class="input-group input-spinner">
+                                <div class="input-group-prepend">
+                                <a href="{% url 'remove_cart' cart_item.product.id %}" class="btn btn-light" type="button" id="button-minus"> <i class="fa fa-minus"></i> </a>
+                                </div>
+                                <input type="text" class="form-control"  value="{{ cart_item.quantity }}">
+                                <div class="input-group-append">
+                                <a href="{% url 'add_cart' cart_item.product.id %}"class="btn btn-light" type="button" id="button-plus"> <i class="fa fa-plus"></i> </a>
+                                </div>
+                            </div> 
+                        </div> 
+        </td>
+        <!-- 가격-->
+        <td> 
+            <div class="price-wrap"> 
+                <var class="price">{{ cart_item.sub_total }}원</var> 
+                <small class="text-muted"> {{ cart_item.product.price }}원  </small> 
+            </div> 
+        </td>
+        <!--물품 삭제-->
+        <td class="text-right"> 
+        <a href="{% url 'remove_cart_item' cart_item.product.id %}" class="btn btn-danger"> 물품삭제</a>
+        </td>
+    </tr>
+{% endfor %}
+    </tbody>
+    </table>
+    </div> 
+
+        </aside> 
+        <!-- 결제-->
+        <aside class="col-lg-3">
+
+            <div class="card">
+            <div class="card-body">
+                <dl class="dlist-align">
+                <dt>물품 가격:</dt>
+                <dd class="text-right">{{ total }}원</dd>
+                </dl>
+                <dl class="dlist-align">
+                <dt>부가세:</dt>
+                <dd class="text-right"> {{ tax }}원</dd>
+                </dl>
+                <dl class="dlist-align">
+                <dt>총 가격</dt>
+                <dd class="text-right text-dark b"><strong>{{ grand_total }}원</strong></dd>
+                </dl>
+                <hr>
+                <p class="text-center mb-3">
+                    <img src="{% static './img/misc/kakaopay.png'%}" height="26">
+                </p>
+                <a href="#" class="btn btn-primary btn-block"> 결제 </a>
+                <a href="{% url 'store' %}" class="btn btn-light btn-block">쇼핑몰로 돌아가기</a>
+            </div> 
+            </div> 
+
+    </aside> 
+
+
+    </div> 
+{% endif %}
+    
+</section>
+
+
+{% endblock %}
