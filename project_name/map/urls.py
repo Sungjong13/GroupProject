@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
     path('', views.map_window, name='map_window'),
-    path('ajax_test/', views.ajax_test, name='ajax_test'),
+    path('map_update/', views.map_update, name='map_update'),
 ]

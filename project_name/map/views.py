@@ -6,7 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 import requests
 from django.http import JsonResponse
 
-
+# 저장된 두가지 kakao api키 적용
 def get_key(setting):
     '''
     returns kakao api key in secrets.json
@@ -21,6 +21,7 @@ def get_key(setting):
         error_msg = "set the {0} environment variable".format(setting)
         raise ImproperlyConfigured(error_msg)
 
+# 입력받은 주소 (도로명 or 지명) 위도경도로 반환
 def get_latlon(address):
     '''
     input string address, return latitude longitude as tuple.
@@ -36,26 +37,16 @@ def get_latlon(address):
         # error 값 2 : 인식 못하는 주솟값 입력함.
         return(2,2)
 
-# Create your views here.
+# map 메인화면
 def map_window(request):
     # get kakao api key
     KAKAO_API_KEY = get_key("KAKAO_API_KEY")
-
-    # 사용자 입력 주소 처리
-    # if request.method == "POST":
-    #     address = request.POST.get("address")
-    #     lat,lon = get_latlon(address)
-
-    #     return JsonResponse({"lat":lat,"lon":lon})
-    # else:
-        # default 값 1. get방식일때 
-    lat,lon = (1, 1)
-
-    return render(request, 'map/map_window.html', {"KAKAO_API_KEY":KAKAO_API_KEY, "lat":lat, "lon":lon})
+    
+    return render(request, 'map/map_window.html', {"KAKAO_API_KEY":KAKAO_API_KEY})
 
 
-# jsonresponse 따로만들어보기
-def ajax_test(request):
+# 이동 누를때 jsonresponse
+def map_update(request):
     address = request.POST.get("address")
     lat,lon = get_latlon(address)
 
@@ -64,7 +55,5 @@ def ajax_test(request):
 
 if __name__ == '__main__':
     pass
-    lat,lon = get_latlon('강남')
-    print(lat,lon)
 
 
