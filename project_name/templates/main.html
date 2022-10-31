@@ -3,8 +3,19 @@
 {% block title %}
   <title>마이펫</title>
 {% endblock title %}
-{% block contents %}
-  {% include 'includes/main_navbar.html' %}
-
-  <img src="{% static 'img/home_image.jpg' %}" alt="홈 이미지">
-{% endblock contents %}
+{% block content %}
+  <div class="container">
+    <div class="position-relative text-center bg-light">
+      <div class="p-lg-5 mx-auto my-5">
+        <h1 class="display-4">Welcome to MyPet</h1>
+        <p class="lead font-weight-normal">
+          Where all pets are considered family
+        </p>
+      </div>
+    </div>
+    
+    <div class="position-relative">
+      <img src="{% static 'img/animal_lowerbanner.jpg' %}" alt="lowerbanner" class="img-fluid" style="width: 100%">
+    </div>
+  </div>
+{% endblock content %}

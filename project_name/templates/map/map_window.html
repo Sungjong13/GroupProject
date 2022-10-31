@@ -59,7 +59,6 @@
         </div>
       </div>
       <div class="col-10">
-        <div id="map_info"></div>
         <div class="map_wrap">
           <div id="map" style="width:100%;height:100%;position:relative;overflow:hidden;"></div>
           <div id="menu_wrap" class="bg_white invisible">
@@ -120,18 +119,22 @@
         url : "{% url 'map_update' %}",
         data : param,
         dataType : 'json',
+
         success : function(data){
           var lat = data['lat'];
           var lon = data['lon'];
-          $('#map_info').html(lat,lon);
+
           if (data['lat'] == 2){
-            // alert('잘못된 주소입니다.');
-            $('#map_info').html('잘못된 주소입니다.')
+
+            alert('잘못된 주소입니다.');
+
           } else {
-            // menu 조건부 보여주기 (메뉴제거)
+
+            // menu 조건부 보여주기 (지도 위의 메뉴제거)
             if(!$('#menu_wrap').hasClass('invisible')){
               $("#menu_wrap").addClass("invisible");
             }
+
             var listEl = document.getElementById('placesList');
             
             // 검색 결과 목록에 추가된 항목들을 제거
@@ -144,8 +147,9 @@
             panTo(lat,lon);
           }
         },
+
         error : function(res,e){
-          $('#map_info').html('ajax오류입니다.')
+          alert('ajax 오류입니다')
           console.log(res.responseText);
         }
       })
