@@ -58,6 +58,8 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.naver",
     "django.contrib.sites",
     "users",
+    "board",
+    "taggit",
 ]
 
 MIDDLEWARE = [
@@ -143,7 +145,6 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # User 커스텀 상태이므로 인증모델 변경
@@ -156,3 +157,7 @@ AUTHENTICATION_BACKENDS = (
 SITE_ID = 1
 LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = "/login/"
+
+# 첨부파일 업로드 위치 설정
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
