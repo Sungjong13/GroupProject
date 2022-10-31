@@ -2,6 +2,8 @@
 function panTo(lat, lon) {
   var movelocation = new kakao.maps.LatLng(lat, lon);
   map.panTo(movelocation);
+  var searchcount = document.querySelector(".badge");
+  searchcount.innerHTML = "";
 }
 
 // 현재 위치 불러오기
@@ -28,6 +30,8 @@ function currentposmap() {
 
 // 장소검색이 완료됐을 때 호출되는 콜백함수
 function placesSearchCB(data, status, pagination) {
+  var removeid = document.querySelector("#clickedlist");
+
   if (status === kakao.maps.services.Status.OK) {
     // 정상적으로 검색이 완료됐으면
     // 검색 목록과 마커를 표출
@@ -37,18 +41,14 @@ function placesSearchCB(data, status, pagination) {
     displayPagination(pagination);
 
     // 검색결과 갯수 표기
-    console.log(data.length);
     var searchcount = document.querySelector("#clickedlist > span");
     searchcount.innerHTML = data.length;
   } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
     alert("검색 결과가 존재하지 않습니다.");
-    return;
   } else if (status === kakao.maps.services.Status.ERROR) {
     alert("검색 결과 중 오류가 발생했습니다.");
-    return;
   }
-  var _temp = document.querySelector("#clickedlist");
-  _temp.removeAttribute("id");
+  removeid.removeAttribute("id");
 }
 
 // 검색 결과 목록과 마커를 표출하는 함수입니다
