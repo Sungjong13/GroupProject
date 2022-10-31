@@ -19,10 +19,11 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from . import views
 from django.conf import settings
-from users.views import HomeView
-
 
 urlpatterns = [
+    # home
+    path('', views.main_page, name="home"),
+
     path('admin/', admin.site.urls),
     path('store_home/', views.home, name='store_home'),
     path('store/', include('store.urls')),
@@ -34,6 +35,4 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path('map/', include('map.urls')),
 
-    # test home
-    path('', HomeView.as_view(), name="home"),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
