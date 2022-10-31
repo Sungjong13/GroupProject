@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block style %}
+<style>
+  .map_wrap, .map_wrap * {margin:0;padding:0;font-family:'Malgun Gothic',dotum,'돋움',sans-serif;font-size:12px;}
+  .map_wrap a, .map_wrap a:hover, .map_wrap a:active{color:#000;text-decoration: none;}
+  .map_wrap {position:relative;width:100%;height:600px;}
+  #menu_wrap {position:absolute;top:0;left:0;bottom:0;width:250px;margin:10px 0 30px 10px;padding:5px;overflow-y:auto;background:rgba(255, 255, 255, 0.9);z-index: 1;font-size:12px;border-radius: 10px;}
+  .bg_white {background:#fff;}
+  .invisible {visibility: hidden;}
+  #placesList li {list-style: none;}
+  #placesList .item {position:relative;border-bottom:1px solid #888;overflow: hidden;cursor: pointer;min-height: 65px;}
+  #placesList .item span {display: block;margin-top:4px;}
+  #placesList .item h5, #placesList .item .info {text-overflow: ellipsis;overflow: hidden;white-space: nowrap;}
+  #placesList .item .info{padding:10px 0 10px 55px;}
+  #placesList .info .gray {color:#8a8a8a;}
+  #placesList .info .jibun {padding-left:26px;background:url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_jibun.png) no-repeat;}
+  #placesList .info .tel {color:#009900;}
+  #placesList .item .markerbg {float:left;position:absolute;width:36px; height:37px;margin:10px 0 0 10px;background:url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png) no-repeat;}
+  #placesList .item .marker_1 {background-position: 0 -10px;}
+  #placesList .item .marker_2 {background-position: 0 -56px;}
+  #placesList .item .marker_3 {background-position: 0 -102px}
+  #placesList .item .marker_4 {background-position: 0 -148px;}
+  #placesList .item .marker_5 {background-position: 0 -194px;}
+  #placesList .item .marker_6 {background-position: 0 -240px;}
+  #placesList .item .marker_7 {background-position: 0 -286px;}
+  #placesList .item .marker_8 {background-position: 0 -332px;}
+  #placesList .item .marker_9 {background-position: 0 -378px;}
+  #placesList .item .marker_10 {background-position: 0 -423px;}
+  #placesList .item .marker_11 {background-position: 0 -470px;}
+  #placesList .item .marker_12 {background-position: 0 -516px;}
+  #placesList .item .marker_13 {background-position: 0 -562px;}
+  #placesList .item .marker_14 {background-position: 0 -608px;}
+  #placesList .item .marker_15 {background-position: 0 -654px;}
+  #pagination {margin:10px auto;text-align: center;}
+  #pagination a {display:inline-block;margin-right:10px;}
+  #pagination .on {font-weight: bold; cursor: default;color:#777;}
+</style>
+{% endblock style %}
+{% block title %}
+  <title>map</title>
+{% endblock title %}
+{% block content %}
+  <div class="container h-100 d-flex flex-column">
+    <div class="row flex-grow-1">
+      <div class="col-2">
+        <div class="row">
+          <form method="post">
+            <div class="form-group mb-2">
+              {% csrf_token %}
+              <label for="inputAddress">주소</label>
+              <input type="text" class="form-control" id="inputAddress" placeholder="" name="address" required>
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">이동</button>
+          </form>
+        </div>
+        <div class="row">
+          <ul class="list-group col" id="searchtermlist"></ul>
+        </div>
+      </div>
+      <div class="col-10">
+        <div class="map_wrap">
+          <div id="map" style="width:100%;height:100%;position:relative;overflow:hidden;"></div>
+          <div id="menu_wrap" class="bg_white invisible">
+              <ul id="placesList"></ul>
+              <div id="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+{% block script %}
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{KAKAO_API_KEY}}&libraries=services"></script>
+  <script src="{% static 'js/map.js' %}"></script>
+  <script>
+    // 마커를 담을 배열
+    var markers = [];
+
+    //지도 생성
+    var container = document.getElementById('map');
+    var options = {
+      center: new kakao.maps.LatLng(33.450701, 126.570667),
+      level: 3
+    };
+    var map = new kakao.maps.Map(container, options);
+
+    // 장소 검색 객체를 생성합니다
+    var ps = new kakao.maps.services.Places();
+
+    // 검색 결과 목록이나 마커를 클릭했을 때 장소명을 표출할 인포윈도우를 생성합니다
+    var infowindow = new kakao.maps.InfoWindow({zIndex:1});
+
+    // 현재위치로 맵 이동
+    currentposmap();
+
+    // 검색제목과 검색어 dict
+    var term_dict = {'동물병원':'동물병원', '반려동물 미용샵':'애완동물 미용', '반려동물 호텔':'애완동물 호텔', '반려동물 용품샵':'애완용품',
+                    '반려동물 분양센터':'반려동물 분양', '반려동물 장례식장':'반려동물장례'};
+
+    // 초기 검색어 리스트 생성
+    createSearchList(term_dict);
+
+
+    // 이동 버튼 클릭 시 ajax
+    $('.btn-primary').on('click', function(e) {
+      e.preventDefault();
+
+      let csrf = $('[name="csrfmiddlewaretoken"]').val();
+
+      let param = {
+        address : $("#inputAddress").val(),
+        csrfmiddlewaretoken : csrf
+      }
+
+      $.ajax({
+        type : 'post',
+        url : "{% url 'map_update' %}",
+        data : param,
+        dataType : 'json',
+
+        success : function(data){
+          var lat = data['lat'];
+          var lon = data['lon'];
+
+          if (data['lat'] == 2){
+
+            alert('잘못된 주소입니다.');
+
+          } else {
+
+            // menu 조건부 보여주기 (지도 위의 메뉴제거)
+            if(!$('#menu_wrap').hasClass('invisible')){
+              $("#menu_wrap").addClass("invisible");
+            }
+
+            var listEl = document.getElementById('placesList');
+            
+            // 검색 결과 목록에 추가된 항목들을 제거
+            removeAllChildNods(listEl);
+      
+            // 지도에 표시되고 있는 마커를 제거
+            removeMarker();
+
+            // 지도 이동
+            panTo(lat,lon);
+          }
+        },
+
+        error : function(res,e){
+          alert('ajax 오류입니다')
+          console.log(res.responseText);
+        }
+      })
+    })
+
+    // li 클릭 시
+    $('.list-group-item').on('click', function(e) {
+      $(this).attr('id', 'clickedlist');
+
+      let searchterm = $(this).attr("searchterm");
+      let curbounds = map.getBounds();
+
+      console.log(map.getBounds());
+
+      // 키워드로 장소를 검색합니다
+      ps.keywordSearch(searchterm, placesSearchCB, {
+        bounds : curbounds
+      });
+
+      // menu 조건부 보여주기 (메뉴추가)
+      if($('#menu_wrap').hasClass('invisible')){
+        $("#menu_wrap").removeClass("invisible");
+      }
+
+    })
+  </script>
+
+{% endblock script %}
