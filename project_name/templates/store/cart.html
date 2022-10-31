@@ -91,7 +91,7 @@
                 <p class="text-center mb-3">
                     <img src="{% static './img/misc/kakaopay.png'%}" height="26">
                 </p>
-                <a href="#" class="btn btn-primary btn-block"> 결제 </a>
+                <a href="{% url 'payment' %}" class="btn btn-primary btn-block"> 결제 </a>
                 <a href="{% url 'store' %}" class="btn btn-light btn-block">쇼핑몰로 돌아가기</a>
             </div> 
             </div> 
@@ -102,6 +102,94 @@
     </div> 
 {% endif %}
     
+
+<!--주문자 정보-->
+<article class="card mb-4">
+    <div class="card-body">
+        <h4 class="card-title mb-4">주문자 정보</h4>
+        <form action="">
+            <div class="row">
+                <div class="form-group col-sm-6">
+                    <label>이름</label>
+                    <input type="text" placeholder="이름을 입력하세요" class="form-control">
+                </div>
+                <div class="form-group col-sm-6">
+                    <label>Email</label>
+                    <input type="email" placeholder="이메일을 입력하세요" class="form-control">
+                </div>
+                <div class="form-group col-sm-6">
+                    <label>전화번호</label>
+                    <input type="text" value="010" placeholder="전화번호를 입력하세요" class="form-control">
+                </div>
+                <div class="form-group col-sm-6">
+                    <label>예비 전화번호</label>
+                    <input type="text" placeholder="전화번호를 입력하세요" class="form-control">
+                </div>
+            </div> 	
+        </form>
+    </div> 
+</article> 
+
+<!-- 배송정보  -->
+<article class="card mb-4">
+    <div class="card-body">
+        <h4 class="card-title mb-4">배송정보</h4>
+        <form action="">
+                
+
+            <div class="row">
+                <div class="form-group col-sm-6">
+                    <label>시/도*</label>
+                    <select name="" class="form-control">
+                        <option value="">서울특별시</option>
+                        <option value="">부산광역시</option>
+                        <option value="">대구광역시</option>
+                        <option value="">인천광역시</option>
+                        <option value="">광주광역시</option>
+                        <option value="">대전광역시</option>
+                        <option value="">울산광역시</option>
+                        <option value="">세종특별자치시</option>
+                        <option value="">경기도</option>
+                        <option value="">강원도</option>
+                        <option value="">충청북도</option>
+                        <option value="">충청남도</option>
+                        <option value="">전라북도</option>
+                        <option value="">전라남도</option>
+                        <option value="">경상북도</option>
+                        <option value="">경상남도</option>
+                        <option value="">제주특별차지도</option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-6">
+                    <label>시/도*</label>
+                    <input type="text" placeholder="시/도를 입력하세요" class="form-control">
+                </div>
+                <div class="form-group col-sm-8">
+                    <label>나머지 주소*</label>
+                    <input type="text" placeholder="나머지 주소를 입력하세요" class="form-control" width="100%;">
+                </div>
+                <div class="form-group col-sm-4">
+                    <label>배송요청</label>
+                    <select name="" class="form-control">
+                        <option value="">문 앞에 놔주세요</option>
+                        <option value="">경비실에 맡겨주세요</option>
+                        <option value="">부재시 연락주세요</option>
+                        <option value="">안전하게 와주세요</option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-8">
+                    <label>다른 요청 사항</label>
+                    <input type="text" value="요청사항이 있다면 써주세요" class="form-control">
+                </div>
+            </div> 
+        </form>
+    </div> 
+</article> 
+
+
+
+
+</main> 
 </section>
 
 

@@ -59,13 +59,13 @@ INSTALLED_APPS = [
     'store',
     'carts',
     'payment',
-
+    "users",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.naver",
     "django.contrib.sites",
-    "users",
+    
 ]
 
 MIDDLEWARE = [
