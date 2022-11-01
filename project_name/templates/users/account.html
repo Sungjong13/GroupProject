@@ -53,25 +53,25 @@
       {% csrf_token %}
       <!--유니크 값 중복체크 keydown 할때마다 검증이 되면 disabled 풀고 아닐땐 disabled 상태-->
       <div class="form-group inputWrapper">
-        <input type="email" name="email" id="email" class="form-control inputSignup" value="" placeholder="이메일" check_result="fail" required="required"/>
+        <input type="email" name="email" id="email" class="form-control inputSignup" value="{{form.email.value|default_if_none:''}}" placeholder="이메일" check_result="fail" required="required"/>
         <button type="button" class="btn btn-secondary email-check check" disabled="disabled">중복체크</button>
       </div>
       <div class="alert-email alertText"></div>
       <div class="form-group inputWrapper">
-        <input type="text" name="nickname" id="nickname" class="form-control inputSignup" value="" placeholder="닉네임" check_result="fail" required="required"/>
+        <input type="text" name="nickname" id="nickname" class="form-control inputSignup" value="{{form.nickname.value|default_if_none:''}}" placeholder="닉네임" check_result="fail" required="required"/>
         <button type="button" class="btn btn-secondary nickname-check check" disabled="disabled">중복체크</button>
       </div>
       <div class="alert-nickname alertText"></div>
       <div class="form-group inputWrapper">
-        <input type="password" name="password" id="password" class="form-control inputSignup" value="" placeholder="비밀번호" required="required"/>
+        <input type="password" name="password" id="password" class="form-control inputSignup" value="{{form.password.value|default_if_none:''}}" placeholder="비밀번호" required="required"/>
       </div>
       <div class="alert-password alertText"></div>
       <div class="form-group inputWrapper">
-        <input type="password" name="confirm_password" id="confirm_password" class="form-control inputSignup" value="" placeholder="비밀번호 재확인" required="required"/>
+        <input type="password" name="confirm_password" id="confirm_password" class="form-control inputSignup" value="{{form.confirm_password.value|default_if_none:''}}" placeholder="비밀번호 재확인" required="required"/>
       </div>
       <div class="alert-confirm-password alertText"></div>
       <div class="form-group my-3">
-        <button type="submit" class="btn btn-primary">회원가입</button>
+        <button type="submit" class="btn btn-primary" id="submitBtn">회원가입</button>
         {% include 'form_errors.html' %}
       </div>
     </form>
@@ -84,10 +84,13 @@
     let nickname = $("#nickname");
     let pwd = $("#password");
     let repwd = $("#confirm_passowrd");
+    let submitbtn = $("#submitBtn");
 
-    let email_status = false;
-    let nickname_status = false;
-    let pw_status = false;
+    //테스트 중
+    let email_check = false;
+    let nickname_check = false;
+    let pwd_check = false;
+    let repwd_check = false;
 
     $(function() {
         email.on("change", function() {
@@ -97,9 +100,11 @@
             if (!validateEmail(email)) {
                 $(".alert-email").text("올바른 이메일 형식이 아닙니다.").attr("style", "color:#f24147;");
                 $(".email-check").attr("disabled", true);
+                email.attr("check_result", "fail")
             } else {
                 $(".alert-email").text("이메일 중복체크가 필요합니다.").attr("style", "color:#f24147;");
                 $(".email-check").attr("disabled", false);
+                email.attr("check_result", "fail")
                 //이메일 입력 변경 시 재 중복 체크 -ajax
                 $(".email-check").on("click", function() {
                     articleCheck(email);
@@ -107,15 +112,18 @@
             }
         })
         nickname.on('change', function() {
+
             nickname.attr("check_result", false);
             $(".nickname-check").attr("class", "btn btn-secondary nickname-check check");
             //닉네임 유효성 검증
             if (!validateNickname(nickname)) {
                 $(".alert-nickname").text("닉네임은 문자와 숫자를 사용해 1-10자로 입력해주세요.").attr("style", "color:#f24147;");
                 $(".nickname-check").attr("disabled", true);
+                nickname.attr("check_result", "fail")
             } else {
                 $(".alert-nickname").text("닉네임 중복체크가 필요합니다.").attr("style", "color:#f24147;");
                 $(".nickname-check").attr("disabled", false);
+                nickname.attr("check_result", "fail")
                 //닉네임 입력 변경 시 재 중복 체크 - ajax
                 $(".nickname-check").on("click", function() {
                     articleCheck(nickname);
@@ -125,7 +133,7 @@
     })
 
 
-
+    //DB, 입력값 비교 ajax
     function articleCheck(check_tag) {
         name = check_tag.attr('name');
         $.ajax({
@@ -149,7 +157,7 @@
                 if (response.data == 'not exist') {
                     $(".alert-" + name).text("사용 가능한 " + name + " 입니다.").css("color", '#13bd7f');
                     $("." + name + "-check").attr("class", "btn btn-primary " + name + "-check check");
-                    check_tag.attr("check_result", true);
+                    return;
                 }
             },
             error: function(xhr, error) {
@@ -157,8 +165,6 @@
             }
         })
     }
-
-
 
     function validateEmail(email) {
         // 이메일 형식 체크 - @, . 포함

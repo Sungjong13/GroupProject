@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% block style %}
+  <style>
+    .pageContainer{
+      width: 100%;
+      min-height: calc(100vh - 52px);
+      position: relative;
+    }
+    .pageContent{
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 0 27px;
+    }
+    .pageLeftContent {
+      position: relative;
+      max-width: 1024px;
+      display: flex;
+      justify-content: space-between;
+      grid-gap: 20px;
+      gap: 20px;
+    }
+
+    .PageList {
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .ListContainer {
+      margin: 30px 0;
+    }
+
+    .ListWrapper {
+      display: flex;
+      justify-content: space-between;
+      grid-gap: 76px;
+      gap: 76px;
+    }
+    .titletext:hover{
+      color : #78c2ad;
+    }
+    .ListImg{
+      width:166px;
+      height:123px;
+    }
+    .ListImg img{
+      min-width:166px;
+      width: 100%;
+      height:100%;
+      border-radius:8px;
+      object-fit;cover;
+    }
+    .pagination{
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .RightContainer{
+      min-width: 150px;
+      margin-top: 40px;
+      position: sticky;
+      top: 20%;
+      height: 100%;
+      text-align: center;
+    }
+  </style>
+{% endblock style %}
+
+{% block content %}
+  <div class="pageContainer">
+    <div class="pageContent">
+      <div class="pageLeftContent">
+
+        <!--왼쪽 페이지 리스트-->
+        <div class="PageList">
+          {% for post in post_list %}
+            <div class="ListContainer">
+              <div class="ListWrapper">
+                <div>
+                  <!--게시글 제목-->
+                  <div class="ListTitle" style="cursor:pointer;" onclick="location.href='{% url 'post_detail' post.pk%}'">
+                    <h5 class="titletext">{{post.title}}</h5>
+                  </div>
+                  <!--게시글 내용-->
+                  <div class="ListContent" style="cursor:pointer;" onclick="location.href='{% url 'post_detail' post.pk%}'">
+                    <small>{{post.content}}</small>
+                  </div>
+                  <!--답변수, 작성자 닉네임, 작성날짜 등-->
+                  <div class="ListAbout" style="cursor:pointer;" onclick="location.href='{% url 'post_detail' post.pk%}'">
+                    <p class="post-meta">
+                      <small>{{post.user}}&nbsp;&nbsp;&nbsp;&nbsp;{{post.created_at|date}}</small>
+                    </p>
+                  </div>
+                  <!--카테고리-->
+                  <div class="labelContainer">
+                    <span class="badge badge-primary">
+                      {{post.category}}
+                    </span>
+                  </div>
+                </div>
+                <!--게시글 첨부 이미지-->
+                <div class="ListImg">
+                  {% if post.image %}
+                  <img src="{{post.image.url}}" alt="첨부파일">
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!--오른쪽 창-->
+        <div class="RightContainer">
+          <div>
+            <button type="button" class="btn btn-primary" onclick="location.href='{% url 'post_create' %}'">
+              글쓰기
+          </button>
+          </div>
+          <div class="PageRightContent">
+            <div class="sortCategory">동물유형</div>
+            <!--카테고리 반복-->
+            <div class="form-group">
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="customCheck1">
+                <label class="custom-control-label" for="customCheck1">Check this custom checkbox</label>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <ul class="pagination pagination-sm">
+        <!--페이지네이션반복-->
+        {% if post_list.has_previous %}
+ 
+        <li class="page-item">
+          <a href="#" class="page-link" data-page="{{post_list.previous_page_number}}">&laquo;</a>
+        </li>
+      {% endif %}
+      {% for page in post_list.paginator.page_range %}
+        {% if page >= post_list.number|add:-3 and page <= post_list.number|add:3 %}
+          <li class="page-item {% if page == post_list.number %}active{% endif %}">
+            <a href="#" class="page-link" data-page="{{page}}">{{page}}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+      {% if post_list.has_next %}
+        <li class="page-item">
+          <a href="#" class="page-link" data-page="{{post_list.next_page_number}}">&raquo;</a>
+        </li>
+      {% endif %}   
+      </ul>
+    </div>
+  </div>
+  <form action="" method="get" id="searchForm">
+    <input type="hidden" name="page" value="{{page}}" id="page">
+  </form>
+{% endblock content %}
+{% block script %}
+<script>
+  //페이지 나누기 버튼 클릭시
+  $(".page-link").on("click", function () {
+    $("#page").val($(this).data("page"));
+    $("#searchForm").submit();
+  })
+</script>
+{% endblock script %}
+               <!--페이지 반복-->
+        {% comment %} {% for  in  %} {% endcomment %}
