@@ -53,7 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     nickname = models.CharField(verbose_name="닉네임", max_length=10, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    created_on = models.DateTimeField(verbose_name="생성 날짜", auto_now_add=True)
+    created_at = models.DateTimeField(verbose_name="생성 날짜", auto_now_add=True)
 
     objects = CustomUserManager()
 
@@ -63,7 +63,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = "사용자"
         verbose_name_plural = "사용자 그룹"
-        ordering = ["-created_on"]
+        ordering = ["-created_at"]
 
     def __str__(self):
         return self.nickname

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block style %}
+  <style>
+    .radioWrap {
+      margin: 10px 0 50px;
+      display: flex;
+      flex-drirection: row;
+      grid-gap: 10px;
+      gap: 10px;
+    }
+
+    .radioWrap input[type=radio] {
+      display: none;
+    }
+
+    .radioWrap input[type=radio]:checked+label {
+      background-color: #78c2ad;
+      color: white;
+      z-index: 1;
+    }
+
+    .radioWrap input[type=radio]+label {
+      width: 70px;
+      height: 30px;
+      line-height: 30px;
+      margin: 0;
+      position: relative;
+      display: inline-block;
+      border: none;
+      border-radius: 30px;
+      background-color: #e4e4e6;
+      color: #868688;
+      font-size: 12px;
+      text-align: center;
+    }
+  </style>
+{% endblock style %}
+
+{% block content %}
+  <div class="container my-3">
+    카테고리
+    <span style="color:red;">*</span>
+    {% include 'form_errors.html' %}
+    <form method="post" enctype="multipart/formdata">
+      {% csrf_token %}
+      <div class="form-group radioWrap">
+        <div>
+          <input type="radio" name="category" id="강아지" value='강아지' checked="checked">
+          <label for="강아지">강아지</label>
+        </div>
+        <div>
+          <input type="radio" name="category" id="고양이" value='고양이'>
+          <label for="고양이">고양이</label>
+        </div>
+        <div>
+          <input type="radio" name="category" id="소동물" value='소동물'>
+          <label for="소동물">소동물</label>
+        </div>
+        <div>
+          <input type="radio" name="category" id="기타" value='기타'>
+          <label for="기타">기타</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="title">
+          질문 작성
+          <span style="color:red;">*</span>
+        </label>
+        <input type="text" name="title" id="title" class="form-control" value="{{postform.title.value|default_if_none:''}}" placeholder="제목을 입력해주세요">
+      </div>
+      <div class="form-group">
+        <textarea name="content" id="content" cols="30" rows="10" class="form-control" placeholder="5자 이상의 질문 내용을 입력해주세요">{{postform.content.value|default_if_none:''}}</textarea>
+      </div>
+      <div class="form-group">
+        <label for="tags">태그 입력</label>
+        <input type="text" name="tags" id="tags" class="form-control" value="{{postform.tags.value|default_if_none:''}}" placeholder="태그를 입력해주세요">
+      </div>
+      <div class="form-group">
+        <label for="exampleInputFile">첨부파일</label>
+        <input type="file" class="form-control-file" name="image" id="exampleInputFile" aria-describedby="fileHelp" multiple="multiple">
+        <small id="fileHelp" class="form-text text-muted">test</small>
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">질문 등록</button>
+      </div>
+    </form>
+  </div>
+{% endblock content %}

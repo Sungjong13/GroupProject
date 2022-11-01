@@ -15,6 +15,8 @@ Including another URLconf
 """
 from config.settings import MEDIA_ROOT
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path, include
 from django.conf.urls.static import static
 from . import views
@@ -22,17 +24,14 @@ from django.conf import settings
 
 urlpatterns = [
     # home
-    path('', views.main_page, name="home"),
-
-    path('admin/', admin.site.urls),
-    path('store_home/', views.home, name='store_home'),
-    path('store/', include('store.urls')),
-    path('cart/', include('carts.urls')),
-    path('users/',include('users.urls')),
-    
-    path('payment/',include('payment.urls')),
-   
+    path("", views.main_page, name="home"),
+    path("admin/", admin.site.urls),
+    path("store_home/", views.home, name="store_home"),
+    path("store/", include("store.urls")),
+    path("cart/", include("carts.urls")),
+    path("users/", include("users.urls")),
+    path("payment/", include("payment.urls")),
     path("accounts/", include("allauth.urls")),
-    path('map/', include('map.urls')),
-
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path("map/", include("map.urls")),
+    path("board/", include("board.urls")),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
