@@ -52,20 +52,21 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # 앱 추가
+
     "category",
     "accounts",
     "store",
     "carts",
     "payment",
+    "users",
+    "board",
+    "taggit",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.naver",
     "django.contrib.sites",
-    "users",
-    "board",
-    "taggit",
-]
+    ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

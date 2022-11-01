@@ -1,3 +1,4 @@
+from turtle import Turtle
 from django.urls.conf import include
 from category.models import Category
 from django.shortcuts import get_object_or_404, render
@@ -9,10 +10,17 @@ from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
+from django.core.paginator import Paginator
+
+
 # Create your views here.
 def store(request, category_slug=None):
     categories = None
     products = None
+    page = request.GET.get('page',1)
+    product = Product.objects.order_by('-created_date')
+    paginator = Paginator(product,6)
+    product_list = paginator.get_page(page)
     
     if category_slug != None:
         categories = get_object_or_404(Category, slug=category_slug)
@@ -24,7 +32,10 @@ def store(request, category_slug=None):
     context = {
       'products': products,
       'products_count': products_count,
+      "product_list":product_list,
+      "page":page,
     }
+    
     return render(request, 'store/store.html', context)
 
 
@@ -42,3 +53,6 @@ def product_detail(request, category_slug, product_slug):
 
     return render(request, 'store/product_detail.html', context)
   
+
+  
+    
